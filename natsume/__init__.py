@@ -6,9 +6,9 @@ from natsume.common import MMR
 
 
 ### Classes
-# Complex eccentricitries containing the eccentricity and
+# Complex eccentricities containing the eccentricity and
 # longitude of periastron for inner and outer planets
-class ComplexEccentricitries:
+class ComplexEccentricities:
     def __init__(self,
                  inner_e=0, inner_periastron=0,
                  outer_e=0, outer_periastron=0):
@@ -27,7 +27,7 @@ class ComplexEccentricitries:
 
 # TTV Sine curve with amplitude in minutes and superperiod in days
 class TTVSineCurve:
-    def __init__(self, amplitude, superperiod):
+    def __init__(self, amplitude: float, superperiod: float):
         try:
             self.amplitude = float(amplitude)
             self.superperiod = float(superperiod)
@@ -39,9 +39,9 @@ class TTVSineCurve:
         return np.array([self.amplitude, self.superperiod])
 
 
-### Mass estimation functions
-def EstimateOuterMass(innerTTV: TTVSineCurve, inner_period: float, mmr: str,
-                      eccentricity=ComplexEccentricitries):
+### Mass estimation functions -- returns array of 2
+def EstimateOuterMass(innerTTV: TTVSineCurve, inner_period, mmr: str,
+                      eccentricity=ComplexEccentricities):
     j, N = MMR(mmr)
 
     if N == 1:
@@ -51,8 +51,8 @@ def EstimateOuterMass(innerTTV: TTVSineCurve, inner_period: float, mmr: str,
 
     return mass
 
-def EstimateInnerMass(outerTTV: TTVSineCurve, outer_period: float, mmr: str,
-                      eccentricity=ComplexEccentricitries):
+def EstimateInnerMass(outerTTV: TTVSineCurve, outer_period, mmr: str,
+                      eccentricity=ComplexEccentricities):
     j, N = MMR(mmr)
     
     if N == 1:
