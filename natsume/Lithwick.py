@@ -4,6 +4,7 @@ import numpy as np
 from natsume.classes import ComplexEccentricities, TTVSineCurve
 from natsume.common import get_b, get_db_da, get_alpha, get_NormalizedResonanceDistance, get_outerPeriods, get_innerPeriods
 
+# Lithwick Laplace coefficients
 def get_f(alpha, j: int):
     return -(j * get_b(alpha, j)) - (alpha/2 * get_db_da(alpha, j))
 

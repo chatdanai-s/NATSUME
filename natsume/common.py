@@ -2,7 +2,6 @@
 import numpy as np
 from scipy.integrate import quad
 
-
 # Determine MMR for string input
 def get_MMR(MMRstr: str):
     try: 
@@ -12,10 +11,10 @@ def get_MMR(MMRstr: str):
             N = jj - ii
             return jj, N
         else:
-            raise ValueError(f"MMR argument must be in 'j:i' format, where i and j are positive integers such that j > i.")
+            raise ValueError(f"MMR argument must be in 'j:i' format, where i, j are integers such that j > i > 0.")
 
     except ValueError:
-        raise ValueError(f"MMR argument must be in 'j:i' format, where i and j are positive integers such that j > i.")
+        raise ValueError(f"MMR argument must be in 'j:i' format, where i, j are integers such that j > i > 0.")
     
 # Semi-major axis ratio
 def get_alpha(innerPeriod, outerPeriod):
