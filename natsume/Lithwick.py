@@ -2,18 +2,20 @@
 import numpy as np
 
 from natsume.classes import ComplexEccentricities, TTVSineCurve
-from natsume.common import get_b, get_db_da, get_alpha, get_NormalizedResonanceDistance, get_outerPeriods, get_innerPeriods
+from natsume.common import get_b, get_Db, get_alpha, get_NormalizedResonanceDistance, get_outerPeriods, get_innerPeriods
 
-# Lithwick Laplace coefficients
+# Lithwick disturbing functions
 def get_f(alpha, j: int):
-    return -(j * get_b(alpha, j)) - (alpha/2 * get_db_da(alpha, j))
+    return -(j * get_b(alpha, j)) - (alpha/2 * get_Db(alpha, j, order=1))
 
 def get_g(alpha, j: int):
-    if j == 2: 
-        correction = -1.25992104989  # 1/(2*alpha^2) s.t. alpha ~ 0.5**(2/3)
+    if j == 2:
+        # -1/(2 * alpha^2) s.t. alpha ~ (1/2)**(2/3) for inner perturber,
+        # -2 * alpha for outer perturber, which are identical!
+        correction = -1.25992104989
     else:
         correction = 0
-    return (j-0.5) * get_b(alpha, j-1) + (alpha/2 * get_db_da(alpha, j-1)) + correction
+    return (j-0.5) * get_b(alpha, j-1) + (alpha/2 * get_Db(alpha, j-1, order=1)) + correction
 
 # Weighted average of free eccentricities
 def get_Zfree(f, g, z: ComplexEccentricities):

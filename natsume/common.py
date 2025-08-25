@@ -29,6 +29,7 @@ def get_outerPeriods(innerPeriod, superperiod: float, j: int, N: int):
     outerPeriod = j / ((j-N) / innerPeriod + 1 / np.array([superperiod, -superperiod]))
     return outerPeriod
 
+# Normalized distance to resonance
 def get_NormalizedResonanceDistance(innerPeriod, outerPeriod, j: int, N: int):
     Delta = outerPeriod/innerPeriod * (j-N)/j - 1
     return Delta
@@ -48,8 +49,18 @@ def get_b(alpha, j: int):
     
     return integral / np.pi
 
-def get_db_da(alpha, j: int, eps=1e-6): # O(eps^2) error
-    return (get_b(alpha + eps, j) - get_b(alpha - eps, j)) / (2 * eps)
-
-def get_d2b_da2(alpha, j: int, eps=1e-6): # O(eps^2) error
-    return (get_b(alpha + eps, j) - 2*get_b(alpha, j) + get_b(alpha - eps, j)) / (eps**2)
+# Central finite difference numerical differentiation (Fornberg 1988)
+# All has O(eps^2) error
+def get_Db(alpha, j: int, order=1, eps=1e-6):
+    if order == 1:
+        return (get_b(alpha + eps, j) - get_b(alpha - eps, j)) / (2 * eps)
+    elif order == 2:
+        return (get_b(alpha + eps, j) - 2*get_b(alpha, j) + get_b(alpha - eps, j)) / (eps**2)
+    elif order == 3:
+        return (0.5*get_b(alpha + 2*eps, j) - get_b(alpha + eps, j) + \
+                get_b(alpha - eps, j) - 0.5*get_b(alpha - 2*eps, j)) / (eps**3)
+    elif order == 4:
+        return (get_b(alpha + 2*eps, j) - 4*get_b(alpha + eps, j) + 6*get_b(alpha, j) - \
+                4*get_b(alpha - eps, j) + get_b(alpha - 2*eps, j)) / (eps**4)
+    else:
+        raise ValueError(f'NATSUME does not support numerical differentation of Laplace coefficients at order {order} (N > 4)')
