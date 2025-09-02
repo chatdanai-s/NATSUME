@@ -35,18 +35,17 @@ def get_NormalizedResonanceDistance(innerPeriod, outerPeriod, j: int, N: int):
     return Delta
 
 # Laplace coefficient and their numerical derivatives
-def get_b(alpha, j: int):
+def get_b(alpha, j: int, epsrel=1e-6):
     def func(theta, alpha, j): # Function to integrate
         return np.cos(j*theta) / np.sqrt(1 - 2*alpha*np.cos(theta) + alpha**2)
 
     if isinstance(alpha, np.ndarray):
         integral = np.array([])
         for a in alpha:
-            int, err = quad(func, 0, 2*np.pi, args=(a, j))
+            int, err = quad(func, 0, 2*np.pi, args=(a, j), epsrel=epsrel)
             integral = np.append(integral, int)
     else:
-        integral, err = quad(func, 0, 2*np.pi, args=(alpha, j))
-    
+        integral, err = quad(func, 0, 2*np.pi, args=(alpha, j), epsrel=epsrel)
     return integral / np.pi
 
 # Central finite difference numerical differentiation (Fornberg 1988)

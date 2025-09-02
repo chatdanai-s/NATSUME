@@ -95,36 +95,78 @@ def get_g_j94(alpha, j): # k=0
         correction = -2.78316397571
     else:
         correction = 0
-    return 1/384 * ((24 - 146*j + 211*j**2 - 104*j**3 + 16*j**4) * get_b(alpha, j-4)
+    return 1/384 * ((24 - 146*j + 211*j**2 - 104*j**3 + 16*j**4) * get_b(alpha, j-4) + \
                     (-24 + 116*j - 120*j**2 + 32*j**3) * alpha * get_Db(alpha, j-4, order=1) + \
                     (12 - 42*j + 24*j**2) * alpha**2 * get_Db(alpha, j-4, order=2) + \
                     (-4 + 8*j) * alpha**3 * get_Db(alpha, j-4, order=3) + \
                     alpha**4 * get_Db(alpha, j-4, order=4)) + correction
 
+# Get gk == g_j,k;N
+def get_gk(N, alpha, j):
+    if N == 2:
+        gk = [get_g_j53(alpha, j), get_g_j49(alpha, j), get_g_j45(alpha, j)]
+    elif N == 3:
+        gk = [get_g_j85(alpha, j), get_g_j84(alpha, j), get_g_j83(alpha, j), get_g_j82(alpha, j)]
+    elif N == 4: 
+        gk = [get_g_j94(alpha, j), get_g_j93(alpha, j), get_g_j92(alpha, j), get_g_j91(alpha, j), get_g_j90(alpha, j)]
+    else:
+        raise NotImplementedError('NATSUME does not support TTVs of order N > 4 near MMR.')
+    return gk
+    
+# AB functions -- gk is a list of g_j,k;N, with index k (from k=0)
+def get_A1(gk, e1, e2, w1, w2):
+    N = len(gk) - 1  # No need to input N!
+    A1 = 0
+    for k in range(N+1):
+        phi = k*w1 + (N-k)*w2
+        A1 += gk[k] * e2**(N-k) * e1**(k) * np.cos(phi)
 
-# AB functions -- Laplace coeffs will be separate args to reduce integration iterations
-# Will eventually be generalized to nth order
-def get_A1(g45, g49, g53, e1, e2, w1, w2):
-    return (g45 * e1**2 * np.cos(2*w1)) + \
-           (g53 * e2**2 * np.cos(2*w2)) + \
-           (g49 * e1*e2 * np.cos(w1+w2))
+    return A1
 
-def get_A2(g45, g49, g53, e1, e2, w1, w2):
-    return -(g45 * e1**2 * np.sin(2*w1)) - \
-            (g53 * e2**2 * np.sin(2*w2)) - \
-            (g49 * e1*e2 * np.sin(w1+w2))
+def get_A2(gk, e1, e2, w1, w2):
+    N = len(gk) - 1  # No need to input N!
+    A2 = 0
+    for k in range(N+1):
+        phi = k*w1 + (N-k)*w2
+        A2 += gk[k] * e2**(N-k) * e1**(k) * np.sin(phi)
 
-def get_B11(g45, g49, e1, e2, w1, w2):
-    return (2 * g45 * e1 * np.cos(w1)) + (g49 * e2 * np.cos(w2))
+    return -A2
 
-def get_B12(g45, g49, e1, e2, w1, w2):
-    return -(2 * g45 * e1 * np.sin(w1)) - (g49 * e2 * np.sin(w2))
+def get_B11(gk, e1, e2, w1, w2):
+    N = len(gk) - 1  # No need to input N!
+    B11 = 0
+    for k in range(N+1):
+        phi = k*w1 + (N-k)*w2
+        B11 += gk[k] * k * e2**(N-k) * e1**(k-1) * np.cos(phi - w1)
 
-def get_B21(g49, g53, e1, e2, w1, w2):
-    return (2 * g53 * e2 * np.cos(w2)) + (g49 * e1 * np.cos(w1))
+    return B11
 
-def get_B22(g49, g53, e1, e2, w1, w2):
-    return -(2 * g53 * e2 * np.sin(w2)) - (g49 * e1 * np.sin(w1))
+def get_B12(gk, e1, e2, w1, w2):
+    N = len(gk) - 1  # No need to input N!
+    B12 = 0
+    for k in range(N+1):
+        phi = k*w1 + (N-k)*w2
+        B12 += gk[k] * k * e2**(N-k) * e1**(k-1) * np.sin(phi - w1)
+
+    return -B12
+
+def get_B21(gk, e1, e2, w1, w2):
+    N = len(gk) - 1  # No need to input N!
+    B21 = 0
+    for k in range(N+1):
+        phi = k*w1 + (N-k)*w2
+        B21 += gk[k] * (N-k) * e2**(N-k-1) * e1**(k) * np.cos(phi - w2)
+
+    return B21
+
+def get_B22(gk, e1, e2, w1, w2):
+    N = len(gk) - 1  # No need to input N!
+    B22 = 0
+    for k in range(N+1):
+        phi = k*w1 + (N-k)*w2
+        B22 += gk[k] * (N-k) * e2**(N-k-1) * e1**(k) * np.sin(phi - w2)
+
+    return -B22
 
 
 # Inversion functions
@@ -143,20 +185,14 @@ def DeckAgolOuterInversion(innerTTV: TTVSineCurve, innerPeriod: float,
     if (e1 == 0) and (e2 == 0):
         raise ValueError('The Deck-Agol model does not provide physical zero-eccentricity mass solutions at N > 1.')
 
-    if N == 2: # Case 2nd Order
-        g45 = get_g_j45(alpha, j)
-        g49 = get_g_j49(alpha, j)
-        g53 = get_g_j53(alpha, j)
+    gk = get_gk(N, alpha, j)
+    A1 = get_A1(gk, e1, e2, w1, w2)
+    A2 = get_A2(gk, e1, e2, w1, w2)
+    B11 = get_B11(gk, e1, e2, w1, w2)
+    B12 = get_B12(gk, e1, e2, w1, w2)
 
-        A1 = get_A1(g45, g49, g53, e1, e2, w1, w2)
-        A2 = get_A2(g45, g49, g53, e1, e2, w1, w2)
-        B11 = get_B11(g45, g49, e1, e2, w1, w2)
-        B12 = get_B12(g45, g49, e1, e2, w1, w2)
-
-        massRatio = np.pi * innerTTV.amplitude * j**(2/3) * (j-N)**(1/3) * np.abs(Delta) / innerPeriod / \
-                    np.sqrt((1.5 * A1 / Delta + B11)**2 + (1.5 * A2 / Delta + B12)**2)
-    else:
-        raise NotImplementedError('NATSUME does not yet support TTVs of order N > 2 near MMR.')
+    massRatio = np.pi * innerTTV.amplitude * j**(2/3) * (j-N)**(1/3) * np.abs(Delta) / innerPeriod / \
+                np.sqrt((1.5 * A1 / Delta + B11)**2 + (1.5 * A2 / Delta + B12)**2)
     
     return massRatio
 
@@ -175,19 +211,13 @@ def DeckAgolInnerInversion(outerTTV: TTVSineCurve, outerPeriod: float,
     if (e1 == 0) and (e2 == 0):
         raise ValueError('The Deck-Agol model does not provide physical zero-eccentricity mass solutions at N > 1.')
     
-    if N == 2: # Case 2nd order
-        g45 = get_g_j45(alpha, j)
-        g49 = get_g_j49(alpha, j)
-        g53 = get_g_j53(alpha, j)
+    gk = get_gk(N, alpha, j)
+    A1 = get_A1(gk, e1, e2, w1, w2)
+    A2 = get_A2(gk, e1, e2, w1, w2)
+    B21 = get_B21(gk, e1, e2, w1, w2)
+    B22 = get_B22(gk, e1, e2, w1, w2)
 
-        A1 = get_A1(g45, g49, g53, e1, e2, w1, w2)
-        A2 = get_A2(g45, g49, g53, e1, e2, w1, w2)
-        B21 = get_B21(g49, g53, e1, e2, w1, w2)
-        B22 = get_B22(g49, g53, e1, e2, w1, w2)
-
-        massRatio = np.pi * outerTTV.amplitude * j * Delta / outerPeriod / \
-                    np.sqrt((-1.5 * A1 / Delta + B21)**2 + (-1.5 * A2 / Delta + B22)**2)
-    else:
-        raise NotImplementedError('NATSUME does not yet support TTVs of order N > 2 near MMR.')
+    massRatio = np.pi * outerTTV.amplitude * j * Delta / outerPeriod / \
+                np.sqrt((-1.5 * A1 / Delta + B21)**2 + (-1.5 * A2 / Delta + B22)**2)
     
     return massRatio
