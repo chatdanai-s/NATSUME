@@ -13,7 +13,7 @@ def get_g_j45(alpha, j): # k=N=2
                   alpha**2 * get_Db(alpha, j, order=2))
 
 def get_g_j49(alpha, j): # k=1
-    return 1/4 * ((-2 + 6*j + 4*j**2) * get_b(alpha, j-1) - \
+    return 1/4 * ((-2 + 6*j - 4*j**2) * get_b(alpha, j-1) - \
                   (4*j - 2) * alpha * get_Db(alpha, j-1, order=1) - \
                   alpha**2 * get_Db(alpha, j-1, order=2))
 
@@ -120,7 +120,6 @@ def get_A1(gk, e1, e2, w1, w2):
     for k in range(N+1):
         phi = k*w1 + (N-k)*w2
         A1 += gk[k] * e2**(N-k) * e1**(k) * np.cos(phi)
-
     return A1
 
 def get_A2(gk, e1, e2, w1, w2):
@@ -129,7 +128,6 @@ def get_A2(gk, e1, e2, w1, w2):
     for k in range(N+1):
         phi = k*w1 + (N-k)*w2
         A2 += gk[k] * e2**(N-k) * e1**(k) * np.sin(phi)
-
     return -A2
 
 def get_B11(gk, e1, e2, w1, w2):
@@ -138,7 +136,6 @@ def get_B11(gk, e1, e2, w1, w2):
     for k in range(N+1):
         phi = k*w1 + (N-k)*w2
         B11 += gk[k] * k * e2**(N-k) * e1**(k-1) * np.cos(phi - w1)
-
     return B11
 
 def get_B12(gk, e1, e2, w1, w2):
@@ -147,7 +144,6 @@ def get_B12(gk, e1, e2, w1, w2):
     for k in range(N+1):
         phi = k*w1 + (N-k)*w2
         B12 += gk[k] * k * e2**(N-k) * e1**(k-1) * np.sin(phi - w1)
-
     return -B12
 
 def get_B21(gk, e1, e2, w1, w2):
@@ -156,7 +152,6 @@ def get_B21(gk, e1, e2, w1, w2):
     for k in range(N+1):
         phi = k*w1 + (N-k)*w2
         B21 += gk[k] * (N-k) * e2**(N-k-1) * e1**(k) * np.cos(phi - w2)
-
     return B21
 
 def get_B22(gk, e1, e2, w1, w2):
@@ -165,7 +160,6 @@ def get_B22(gk, e1, e2, w1, w2):
     for k in range(N+1):
         phi = k*w1 + (N-k)*w2
         B22 += gk[k] * (N-k) * e2**(N-k-1) * e1**(k) * np.sin(phi - w2)
-
     return -B22
 
 
