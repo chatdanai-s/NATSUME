@@ -1,4 +1,6 @@
 # Curve fits TTVs and returns TTV amplitude and superperiod
+# Make sure the initial period guess is close to actual period! Else the fitting doesn't work
+# Lomb-Scargle periodogram not used because superperiod can already be estimated from TTVFast inputs
 import numpy as np
 from scipy.optimize import curve_fit
 
