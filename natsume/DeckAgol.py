@@ -174,7 +174,6 @@ def DeckAgolOuterInversion(innerTTV: TTVSineCurve, innerPeriod: float,
     alpha = get_alpha(innerPeriod, outerPeriods)
     Delta = get_NormalizedResonanceDistance(innerPeriod, outerPeriods, j, N)
     e1, w1, e2, w2 = eccentricity.arr
-    w1, w2 = np.deg2rad(w1), np.deg2rad(w2) # Uses rad in np.cos() and np.sin()
 
     if (e1 == 0) and (e2 == 0):
         raise ValueError('The Deck-Agol model does not provide physical zero-eccentricity mass solutions at N > 1.')
