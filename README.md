@@ -1,8 +1,66 @@
-# NATSUME
+# NATSUME  
 **N**ear-resonant **A**nalytic **T**TV **S**olver for **U**nknown **M**ass **E**stimates (NATSUME) for Python 3 (Work in progress!)
 
-A python 3 module which aims to quickly estimate non-transiting exoplanet masses in possible near Mean Motion Resonance (MMR) solutions from approximately sinusoidal Transit Timing Variation (TTV) signals.
+A python 3 module which aims to quickly estimate non-transiting exoplanet masses in possible near Mean Motion Resonance (MMR) scenarios from approximately sinusoidal Transit Timing Variation (TTV) signals.
 
 The TTV mass inversion estimations are based from Lithwick's model for 1st order near MMR (https://doi.org/10.1088/0004-637X/761/2/122) and Deck-Agol's model for higher order near MMRs (https://doi.org/10.3847/0004-637X/821/2/96).
 
-Please note that the outputs will only serve as estimates to quickly gauge appropriate priors for more robust parameter fitting via n-body simulation codes, combined with methods such as nested sampling or MCMC. Moreover, the models assume a one-star two-planet system, low (but non-zero) orbital eccentricities and perfect coplanarity with respect to the line of sight.
+Please note that the mass outputs will only serve as estimates to quickly gauge the solution's order of magnitude, as a complement to n-body code + MCMC results. Moreover, the models assume a one-star two-planet system, low (but non-zero) orbital eccentricities, and perfect coplanarity with respect to the line of sight.
+
+Usage
+=====
+
+To use NATSUME:
+* Build two objects containing TTV signal information (amplitude and "superperiod") and complex orbital eccentricity information (see Lithwick's eqn. 11) via ``natsume.get_TTVSineCurve`` and  ``natsume.get_ComplexEccentricities`` respectively.
+* Estimate inner or outer exoplanet masses via ``natsume.EstimateInnerMass`` or ``natsume.EstimateOuterMass`` functions.
+* The code will return a list of two possible mass solutions calculated from the input arguments.
+  * Remark: There are two solutions, because the perturbing planet's period is unknown if it is non-transiting, and two values are possible given the definition of the TTV superperiod (see Lithwick's eqn. 5). You can restrict to one solution by specifying the perturbing planet's period in the estimation functions. This skips the calculation of the perturbing planet's period completely, so make sure the ``mmr`` argument is close enough!
+
+For example, to estimate the outer planet Kepler-32 c's mass assuming zero eccentricity:
+
+```python
+import natsume
+
+# We use Kepler-32, all time unit in days (from Lithwick et al. 2012)
+# Expected solution: 7.59 Earths for outer planet c
+
+# Setup parameters here
+Pb = 5.901    # Inner period (days)
+Pc = 8.752    # Outer period (days)
+Vb = 0.0062   # Inner TTV Amplitude (days)
+PTTV = 1/abs(3/Pc - 2/Pb)  # Calculated TTV "superperiod" (not provided by Lithwick; so we calculate)
+mmr = '3:2'   # MMR Scenario
+Mstar = 0.49  # Host star mass (solar masses)
+
+# Build object for sinusoidal inner TTV
+TTVb = natsume.get_TTVSineCurve(amplitude=Vb, superperiod=PTTV)
+
+# Build object for system complex eccentricity; Assumes zero eccentricity in this case
+z = natsume.get_ComplexEccentricities()
+
+# Estimate outer planet mass relative to the host star
+mu_c = natsume.EstimateOuterMass(
+   innerTTV=TTVb,
+   inner_period=Pb,
+   mmr=mmr,
+   eccentricity=z,
+   outer_period=None
+)
+```
+For nonzero eccentricities, let's suppose inner "free eccentricity" is 0.01, inner longitude of periastron is 90 degrees, outer "free eccentricity" is 0.03, and outer longitude of periastron is 200 degrees, the following arguments are to be put in ``natsume.get_ComplexEccentricities``
+```python
+z = natsume.get_ComplexEccentricities(e1=0.01, w1=90, e2=0.03, w2=200)
+```
+
+And if the perturbing outer planet's orbital period is known (``Pc``), modify the ``outer_period=None`` argument in ``natsume.EstimateOuterMass`` as follows:
+```python
+mu_c = natsume.EstimateOuterMass(
+   innerTTV=TTVb,
+   inner_period=Pb,
+   mmr=mmr,
+   eccentricity=z,
+   outer_period=Pc
+)
+```
+
+For further details, see documentation which hasn't been written yet (It's work in progress code!)
