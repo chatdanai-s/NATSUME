@@ -14,7 +14,7 @@ To use NATSUME:
 * Build two objects containing TTV signal information (amplitude and "superperiod") and complex orbital eccentricity information (see Lithwick's eqn. 11) via ``natsume.get_TTVSineCurve`` and  ``natsume.get_ComplexEccentricities`` respectively.
 * Estimate inner or outer exoplanet masses via ``natsume.EstimateInnerMass`` or ``natsume.EstimateOuterMass`` functions.
 * The code will return a list of two possible mass solutions calculated from the input arguments.
-  * Remark: There are two solutions, because the perturbing planet's period is unknown if it is non-transiting, and two values are possible given the definition of the TTV superperiod (see Lithwick's eqn. 5). You can restrict to one solution by specifying the perturbing planet's period in the estimation functions. This skips the calculation of the perturbing planet's period completely, so make sure the ``mmr`` argument is close enough!
+  * Remark: There are two solutions, because the perturbing planet's period can be unknown if it is non-transiting, and two periods are possible given the definition of the TTV superperiod (see Lithwick's eqn. 5). You can restrict to one solution by specifying the perturbing planet's period in the estimation functions. This skips the calculation of the perturbing planet's period completely, so make sure the ``mmr`` argument is close enough!
 
 For example, to estimate the outer planet Kepler-32 c's mass assuming zero eccentricity:
 
