@@ -63,4 +63,11 @@ mu_c = natsume.EstimateOuterMass(
 )
 ```
 
+Finally, conversion from ``mu_c`` in host stellar mass to mass estimate in Earth masses can be done with ``astropy.units``. In-NATSUME support may be available in the future.
+```python
+from astropy import units as u
+m_c = (mu_c * Mstar*u.M_sun).to(u.M_earth).value
+print(f'Estimated outer planet mass: {m} Earths')
+```
+
 For further details, see documentation which hasn't been written yet (It's work in progress code!)
