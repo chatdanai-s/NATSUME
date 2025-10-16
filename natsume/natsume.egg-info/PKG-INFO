@@ -1,3 +1,21 @@
+Metadata-Version: 2.4
+Name: natsume
+Version: 0.1.0
+Summary: Near-resonant Analytic TTV Solver for Unknown Mass Estimates
+Author-email: Chatdanai Sawangwong <chatdanai.saw@student.mahidol.edu>
+License: MIT
+Project-URL: Homepage, https://github.com/chatdanai-s/NATSUME
+Project-URL: BugTracker, https://github.com/chatdanai-s/NATSUME/issues
+Keywords: ttv,mmr,exoplanets
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.25
+Requires-Dist: scipy>=1.12
+Dynamic: license-file
+
 # NATSUME  
 **N**ear-resonant **A**nalytic **T**TV **S**olver for **U**nknown **M**ass **E**stimates (NATSUME) for Python 3 (Work in progress!)
 
