@@ -1,8 +1,8 @@
 # Functions that only exist in the Lithwick (2012) literature
 import numpy as np
 
-from natsume.classes import ComplexEccentricities, TTVSineCurve
-from natsume.common import get_b, get_Db, get_alpha, get_NormalizedResonanceDistance, get_outerPeriods, get_innerPeriods
+from .classes import ComplexEccentricities, TTVSineCurve
+from .common import get_b, get_Db, get_alpha, get_NormalizedResonanceDistance, get_outerPeriods, get_innerPeriods
 
 # Lithwick disturbing functions
 def get_f(alpha, j: int):
