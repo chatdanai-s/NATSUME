@@ -71,3 +71,5 @@ def characterize_ttv(time, ttv, ttv_err, expected_period, method='scipy'):
 
     # Return [A, B, V, Pttv, phase], their errors, and red-chi2 score
     return popt_ttv, perr_ttv, r2
+
+# Test GitHub syncing!
