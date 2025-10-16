@@ -1,7 +1,8 @@
-from natsume.classes import TTVSineCurve, ComplexEccentricities
-from natsume.common import get_MMR
-from natsume.Lithwick import LithwickOuterInversion, LithwickInnerInversion
-from natsume.DeckAgol import DeckAgolOuterInversion, DeckAgolInnerInversion
+# Near-resonant Analytic TTV Solver for Unknown Mass Estimation
+from .classes import TTVSineCurve, ComplexEccentricities
+from .common import get_MMR
+from .Lithwick import LithwickOuterInversion, LithwickInnerInversion
+from .DeckAgol import DeckAgolOuterInversion, DeckAgolInnerInversion
 
 # Create classes (Cannot define classes here due to circular import)
 def get_ComplexEccentricities(inner_e=0, inner_periastron=0,

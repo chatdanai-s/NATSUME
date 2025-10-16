@@ -1,9 +1,9 @@
 # Functions that only exist in the Deck-Agol (2016) literature
 import numpy as np
 
-from natsume.classes import ComplexEccentricities, TTVSineCurve
-from natsume.common import get_outerPeriods, get_innerPeriods, get_alpha, get_NormalizedResonanceDistance
-from natsume.common import get_b, get_Db
+from .classes import ComplexEccentricities, TTVSineCurve
+from .common import get_outerPeriods, get_innerPeriods, get_alpha, get_NormalizedResonanceDistance
+from .common import get_b, get_Db
 
 # Source: Dermott & Murray 1999, Appendix B
 # Disturbing function coefficients (2nd order)

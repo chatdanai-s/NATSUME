@@ -1,0 +1,8 @@
+LICENSE
+README.md
+pyproject.toml
+natsume/natsume.egg-info/PKG-INFO
+natsume/natsume.egg-info/SOURCES.txt
+natsume/natsume.egg-info/dependency_links.txt
+natsume/natsume.egg-info/requires.txt
+natsume/natsume.egg-info/top_level.txt
