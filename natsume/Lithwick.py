@@ -54,6 +54,6 @@ def LithwickInnerInversion(outerTTV: TTVSineCurve, outerPeriod: float,
     Delta = get_NormalizedResonanceDistance(innerPeriods, outerPeriod, j, N=1)
     Zfree = get_Zfree(f, g, z)
 
-    massRatio = np.pi * outerTTV.amplitude * j * np.abs(Delta) / outerPeriod  / \
+    massRatio = np.pi * outerTTV.amplitude * j * np.abs(Delta) / outerPeriod / \
                 np.abs(-g + 1.5 * np.conj(Zfree) / Delta)
     return massRatio
