@@ -28,7 +28,7 @@ class TTVSineCurve:
     def __init__(self, amplitude: float, superperiod: float):
         try:
             if (amplitude <= 0) or (superperiod <= 0):
-                raise ValueError(f'amplitude and superperiod in TTVSineCurve must be greater than 0.')
+                raise ValueError(f'Amplitude and superperiod in TTVSineCurve must be greater than 0.')
             self.amplitude = float(amplitude)
             self.superperiod = float(superperiod)
 
