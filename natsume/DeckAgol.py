@@ -186,7 +186,6 @@ def DeckAgolOuterInversion(innerTTV: TTVSineCurve, innerPeriod: float,
 
     massRatio = np.pi * innerTTV.amplitude * j**(2/3) * (j-N)**(1/3) * np.abs(Delta) / innerPeriod / \
                 np.sqrt((1.5 * A1 / Delta + B11)**2 + (1.5 * A2 / Delta + B12)**2)
-    
     return massRatio
 
 def DeckAgolInnerInversion(outerTTV: TTVSineCurve, outerPeriod: float,
@@ -202,7 +201,7 @@ def DeckAgolInnerInversion(outerTTV: TTVSineCurve, outerPeriod: float,
 
     if (e1 == 0) and (e2 == 0):
         raise ValueError('The Deck-Agol model does not provide physical zero-eccentricity mass solutions at N > 1.')
-    
+
     gk = get_gk(N, alpha, j)
     A1 = get_A1(gk, e1, e2, w1, w2)
     A2 = get_A2(gk, e1, e2, w1, w2)
@@ -211,5 +210,4 @@ def DeckAgolInnerInversion(outerTTV: TTVSineCurve, outerPeriod: float,
 
     massRatio = np.pi * outerTTV.amplitude * j * np.abs(Delta) / outerPeriod / \
                 np.sqrt((-1.5 * A1 / Delta + B21)**2 + (-1.5 * A2 / Delta + B22)**2)
-    
     return massRatio
