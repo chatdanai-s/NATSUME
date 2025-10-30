@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: natsume
-Version: 0.1.1
+Version: 0.1.2
 Summary: Near-resonant Analytic TTV Solver for Unknown Mass Estimates
 Author-email: Chatdanai Sawangwong <chatdanai.saw@student.mahidol.edu>
 License: MIT
@@ -23,7 +23,17 @@ A python 3 module which aims to quickly estimate non-transiting exoplanet masses
 
 The TTV mass inversion estimations are based from Lithwick's model for 1st order near MMR (https://doi.org/10.1088/0004-637X/761/2/122) and Deck-Agol's model for higher order near MMRs (https://doi.org/10.3847/0004-637X/821/2/96).
 
-Please note that the mass outputs will only serve as estimates to quickly gauge the solution's order of magnitude, as a complement to n-body code + MCMC results. Moreover, the models assume a one-star two-planet system, low (but non-zero) orbital eccentricities, and perfect coplanarity with respect to the line of sight.
+Installation
+=====
+Eventually, installation should be as simple as
+```
+pip install natsume
+```
+
+But right now, you can install it from the TestPyPI package index:
+```
+pip install -i https://test.pypi.org/simple/ natsume
+```
 
 Usage
 =====
@@ -81,11 +91,12 @@ mu_c = natsume.EstimateOuterMass(
 )
 ```
 
-Finally, conversion from ``mu_c`` in host stellar mass to mass estimate in Earth masses can be done with ``astropy.units``. In-NATSUME support may be available in the future.
+Finally, conversion from ``mu_c`` in host stellar mass to mass estimate in Earth masses can be done with ``astropy.units``. In-package support may be available in the future.
 ```python
 from astropy import units as u
 m_c = (mu_c * Mstar*u.M_sun).to(u.M_earth).value
 print(f'Estimated outer planet mass: {m} Earths')
 ```
 
-For further details, see documentation which hasn't been written yet (It's work in progress code!)
+
+For further details, see documentation which hasn't been written yet (It's work in progress code!, or you can just read the source code)
