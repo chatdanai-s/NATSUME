@@ -2,6 +2,7 @@
 import numpy as np
 
 from .classes import ComplexEccentricities, TTVSineCurve
+from .Lithwick import get_f, get_g, get_Zfree
 from .common import get_outerPeriods, get_innerPeriods, get_alpha, get_NormalizedResonanceDistance
 from .common import get_b, get_Db
 
@@ -162,10 +163,35 @@ def get_B22(gk, e1, e2, w1, w2):
         B22 += gk[k] * (N-k) * e2**(N-k-1) * e1**(k) * np.sin(phi - w2)
     return -B22
 
+# Get 1st order Delta of nearest MMR
+def get_1stOrderDelta(innerPeriod, outerPeriod):
+    Pratio = outerPeriod / innerPeriod
+
+    # Get j boundary e.g. 1.66 sits between j=2 and j=3
+    jmin = np.ceil(1 / (Pratio - 1)) 
+    jmax = jmin + 1
+
+    # Get period threshold between j and j+1
+    Pratio_threshold = 0.5 * (jmin/(jmin - 1) + jmax/(jmax - 1))
+
+    # Vectorized selection: choose jmin or jmax per element
+    use_jmin = (Pratio >= Pratio_threshold)
+    j = np.where(use_jmin, jmin, jmax)
+
+    # Compute Delta directly for all elements
+    Delta1o = get_NormalizedResonanceDistance(innerPeriod, outerPeriod, j, N=1)
+
+    # Return scalar if both inputs were scalar
+    if np.isscalar(innerPeriod) and np.isscalar(outerPeriod):
+        return float(Delta1o)
+    return Delta1o
+
 
 # Inversion functions
+# LithwickTerm arg currently does NOT work and will likely be removed in the future
 def DeckAgolOuterInversion(innerTTV: TTVSineCurve, innerPeriod: float,
-                           j: int, N: int, eccentricity: ComplexEccentricities, outerPeriod='none'):
+                           j: int, N: int, eccentricity: ComplexEccentricities,
+                           outerPeriod='none', LithwickTerm=False):
     if outerPeriod == 'none':
         outerPeriods = get_outerPeriods(innerPeriod, innerTTV.superperiod, j, N)
     else:
@@ -175,8 +201,18 @@ def DeckAgolOuterInversion(innerTTV: TTVSineCurve, innerPeriod: float,
     Delta = get_NormalizedResonanceDistance(innerPeriod, outerPeriods, j, N)
     e1, w1, e2, w2 = eccentricity.arr
 
-    if (e1 == 0) and (e2 == 0):
-        raise ValueError('The Deck-Agol model does not provide physical zero-eccentricity mass solutions at N > 1.')
+    # Inclusion of 1st order term
+    if LithwickTerm == False:
+        if (e1 == 0) and (e2 == 0):
+            raise ValueError('The Deck-Agol model does not provide physical zero-eccentricity mass solutions at N > 1.')
+        lwTerm = 0
+    
+    elif LithwickTerm == True: # Does not work
+        f = get_f(alpha, j)
+        g = get_g(alpha, j)
+        Delta1o = get_1stOrderDelta(innerPeriod, outerPeriods)
+        Zfree = get_Zfree(f, g, eccentricity)
+        lwTerm = np.abs(f + 1.5 * np.conj(Zfree) / Delta1o)
 
     gk = get_gk(N, alpha, j)
     A1 = get_A1(gk, e1, e2, w1, w2)
@@ -189,7 +225,8 @@ def DeckAgolOuterInversion(innerTTV: TTVSineCurve, innerPeriod: float,
     return massRatio
 
 def DeckAgolInnerInversion(outerTTV: TTVSineCurve, outerPeriod: float,
-                           j: int, N: int, eccentricity: ComplexEccentricities, innerPeriod='none'):
+                           j: int, N: int, eccentricity: ComplexEccentricities,
+                           innerPeriod='none', LithwickTerm=False):
     if innerPeriod == 'none':
         innerPeriods = get_innerPeriods(outerPeriod, outerTTV.superperiod, j, N)
     else:
@@ -199,9 +236,19 @@ def DeckAgolInnerInversion(outerTTV: TTVSineCurve, outerPeriod: float,
     Delta = get_NormalizedResonanceDistance(innerPeriods, outerPeriod, j, N)
     e1, w1, e2, w2 = eccentricity.arr
 
-    if (e1 == 0) and (e2 == 0):
-        raise ValueError('The Deck-Agol model does not provide physical zero-eccentricity mass solutions at N > 1.')
+    # Inclusion of 1st order term
+    if LithwickTerm == False:
+        if (e1 == 0) and (e2 == 0):
+            raise ValueError('The Deck-Agol model does not provide physical zero-eccentricity mass solutions at N > 1.')
+        lwTerm = 0
 
+    elif LithwickTerm == True:
+        f = get_f(alpha, j)
+        g = get_g(alpha, j)
+        Delta1o = get_1stOrderDelta(innerPeriods, outerPeriod)
+        Zfree = get_Zfree(f, g, eccentricity)
+        lwTerm = np.abs(-g + 1.5 * np.conj(Zfree) / Delta1o)
+    
     gk = get_gk(N, alpha, j)
     A1 = get_A1(gk, e1, e2, w1, w2)
     A2 = get_A2(gk, e1, e2, w1, w2)

@@ -19,10 +19,11 @@ def EstimateOuterMass(innerTTV: TTVSineCurve, inner_period: float, mmr: str,
     j, N = get_MMR(mmr)
 
     if N == 1:
-        mass = LithwickOuterInversion(innerTTV, inner_period, j, eccentricity, outerPeriod=outer_period)
+        mass = LithwickOuterInversion(innerTTV, inner_period, j,
+                                      eccentricity, outerPeriod=outer_period)
     else:
-        mass = DeckAgolOuterInversion(innerTTV, inner_period, j, N, eccentricity, outerPeriod=outer_period)
-
+        mass = DeckAgolOuterInversion(innerTTV, inner_period, j, N,
+                                      eccentricity, outerPeriod=outer_period)
     return mass
 
 def EstimateInnerMass(outerTTV: TTVSineCurve, outer_period: float, mmr: str,
@@ -30,8 +31,9 @@ def EstimateInnerMass(outerTTV: TTVSineCurve, outer_period: float, mmr: str,
     j, N = get_MMR(mmr)
     
     if N == 1:
-        mass = LithwickInnerInversion(outerTTV, outer_period, j, eccentricity, innerPeriod=inner_period)
+        mass = LithwickInnerInversion(outerTTV, outer_period, j,
+                                      eccentricity, innerPeriod=inner_period)
     else:
-        mass = DeckAgolInnerInversion(outerTTV, outer_period, j, N, eccentricity, innerPeriod=inner_period)
-
+        mass = DeckAgolInnerInversion(outerTTV, outer_period, j, N,
+                                      eccentricity, innerPeriod=inner_period)
     return mass
