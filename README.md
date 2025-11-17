@@ -7,15 +7,11 @@ The TTV mass inversion estimations are based from Lithwick's model for 1st order
 
 Installation
 =====
-Eventually, installation should be as simple as
+Install from pypi:
 ```
-pip install natsume
+pip install natsume-ttv
 ```
 
-But right now, you can install it from the TestPyPI package index:
-```
-pip install -i https://test.pypi.org/simple/ natsume
-```
 
 Usage
 =====
