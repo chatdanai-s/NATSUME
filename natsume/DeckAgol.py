@@ -43,7 +43,7 @@ def get_g_j83(alpha, j): # k=2
                    alpha**3 * get_Db(alpha, j-1, order=3))
 
 def get_g_j84(alpha, j): # k=1
-    return 1/16 * ((8 - 32*j + 30*j**2 + 8*j**3) * get_b(alpha, j-2) + \
+    return 1/16 * ((8 - 32*j + 30*j**2 - 8*j**3) * get_b(alpha, j-2) + \
                    (-8 + 23*j - 12*j**2) * alpha * get_Db(alpha, j-2, order=1) + \
                    (4 - 6*j) * alpha**2 * get_Db(alpha, j-2, order=2) - \
                    alpha**3 * get_Db(alpha, j-2, order=3))
@@ -164,6 +164,7 @@ def get_B22(gk, e1, e2, w1, w2):
     return -B22
 
 # Get 1st order Delta of nearest MMR
+# (Not used)
 def get_1stOrderDelta(innerPeriod, outerPeriod):
     Pratio = outerPeriod / innerPeriod
 
@@ -191,7 +192,7 @@ def get_1stOrderDelta(innerPeriod, outerPeriod):
 # LithwickTerm arg currently does NOT work and will likely be removed in the future
 def DeckAgolOuterInversion(innerTTV: TTVSineCurve, innerPeriod: float,
                            j: int, N: int, eccentricity: ComplexEccentricities,
-                           outerPeriod='none', LithwickTerm=False):
+                           outerPeriod='none'):
     if outerPeriod == 'none':
         outerPeriods = get_outerPeriods(innerPeriod, innerTTV.superperiod, j, N)
     else:
@@ -201,18 +202,8 @@ def DeckAgolOuterInversion(innerTTV: TTVSineCurve, innerPeriod: float,
     Delta = get_NormalizedResonanceDistance(innerPeriod, outerPeriods, j, N)
     e1, w1, e2, w2 = eccentricity.arr
 
-    # Inclusion of 1st order term
-    if LithwickTerm == False:
-        if (e1 == 0) and (e2 == 0):
-            raise ValueError('The Deck-Agol model does not provide physical zero-eccentricity mass solutions at N > 1.')
-        lwTerm = 0
-    
-    elif LithwickTerm == True: # Does not work
-        f = get_f(alpha, j)
-        g = get_g(alpha, j)
-        Delta1o = get_1stOrderDelta(innerPeriod, outerPeriods)
-        Zfree = get_Zfree(f, g, eccentricity)
-        lwTerm = np.abs(f + 1.5 * np.conj(Zfree) / Delta1o)
+    if (e1 == 0) and (e2 == 0):
+        raise ValueError('The Deck-Agol model does not provide physical zero-eccentricity mass solutions at N > 1.')
 
     gk = get_gk(N, alpha, j)
     A1 = get_A1(gk, e1, e2, w1, w2)
@@ -226,7 +217,7 @@ def DeckAgolOuterInversion(innerTTV: TTVSineCurve, innerPeriod: float,
 
 def DeckAgolInnerInversion(outerTTV: TTVSineCurve, outerPeriod: float,
                            j: int, N: int, eccentricity: ComplexEccentricities,
-                           innerPeriod='none', LithwickTerm=False):
+                           innerPeriod='none'):
     if innerPeriod == 'none':
         innerPeriods = get_innerPeriods(outerPeriod, outerTTV.superperiod, j, N)
     else:
@@ -236,18 +227,8 @@ def DeckAgolInnerInversion(outerTTV: TTVSineCurve, outerPeriod: float,
     Delta = get_NormalizedResonanceDistance(innerPeriods, outerPeriod, j, N)
     e1, w1, e2, w2 = eccentricity.arr
 
-    # Inclusion of 1st order term
-    if LithwickTerm == False:
-        if (e1 == 0) and (e2 == 0):
-            raise ValueError('The Deck-Agol model does not provide physical zero-eccentricity mass solutions at N > 1.')
-        lwTerm = 0
-
-    elif LithwickTerm == True:
-        f = get_f(alpha, j)
-        g = get_g(alpha, j)
-        Delta1o = get_1stOrderDelta(innerPeriods, outerPeriod)
-        Zfree = get_Zfree(f, g, eccentricity)
-        lwTerm = np.abs(-g + 1.5 * np.conj(Zfree) / Delta1o)
+    if (e1 == 0) and (e2 == 0):
+        raise ValueError('The Deck-Agol model does not provide physical zero-eccentricity mass solutions at N > 1.')
     
     gk = get_gk(N, alpha, j)
     A1 = get_A1(gk, e1, e2, w1, w2)
