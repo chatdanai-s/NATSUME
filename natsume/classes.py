@@ -9,6 +9,7 @@ class ComplexEccentricities:
                  outer_e=0, outer_periastron=0):
         """
         Returns complex eccentricities (eccentricity and longitude of periastron) of two planets in the system.
+
         Used as input in functions requiring eccentricies and longitudes of periastron.
 
         Args:
@@ -35,6 +36,7 @@ class ComplexEccentricities:
     def arr(self):
         """
         Returns array representation of values in class ComplexEccentricties object.
+
         Note that the angles are stored and output in rad even if the input is in degrees.
 
         Args:
@@ -52,6 +54,8 @@ class TTVSineCurve:
     def __init__(self, amplitude: float, superperiod: float):
         """
         Returns TTV sine curve representation (Amplitude and Superperiod) of a planet, both in days.
+        Does not specify if inner TTV or outer TTV.
+
         Used as input in functions requiring sinusoidal TTV curves.
 
         Args:

@@ -14,7 +14,7 @@ def get_f(alpha, j: int):
         j: Number denoting j:j-1 mean motion resonance of system (integer)
 
     Returns:
-        f(alpha) as described in Table 3 of Lithwick et al. (2012). (float or array)
+        f: As described in Table 3 of Lithwick et al. (2012). (float or array)
     """
     return -(j * get_b(alpha, j)) - (alpha/2 * get_Db(alpha, j, order=1))
 
@@ -28,7 +28,7 @@ def get_g(alpha, j: int):
         j: Number denoting j:j-1 mean motion resonance of system (integer)
 
     Returns:
-        g(alpha) as described in Table 3 of Lithwick et al. (2012). (float or array)
+        g: As described in Table 3 of Lithwick et al. (2012). (float or array)
     """
     if j == 2:
         # -1/(2 * alpha^2) s.t. alpha ~ (1/2)**(2/3) for inner perturber,
@@ -49,7 +49,7 @@ def get_Zfree(f, g, z: ComplexEccentricities):
         z: Complex eccentricities of two planets in the system (class ComplexEccentricies)
 
     Returns:
-        Z_free as described in equation 10 of Lithwick et al. (2012). (float or array)
+        Z_free: As described in equation 10 of Lithwick et al. (2012). (float or array)
     """
     return (f * z.inner_e * np.exp(1j * z.inner_periastron)) + \
            (g * z.outer_e * np.exp(1j * z.outer_periastron))
@@ -71,7 +71,9 @@ def LithwickOuterInversion(innerTTV: TTVSineCurve, innerPeriod: float,
 
     Returns:
         mu: Mass of outer planet with unit of host star mass (array or float).
+
         If outerPeriod == 'none', mu will be an array with two possible mass solutions.
+
         If outerPeriod is given, mu will be a float with one possible mass solution.
     """
     if outerPeriod == 'none':
@@ -104,7 +106,9 @@ def LithwickInnerInversion(outerTTV: TTVSineCurve, outerPeriod: float,
 
     Returns:
         mu: Mass of inner planet with unit of host star mass (array or float).
+
         If innerPeriod == 'none', mu will be an array with two possible mass solutions.
+
         If innerPeriod is given, mu will be a float with one possible mass solution.
     """
     if innerPeriod == 'none':
