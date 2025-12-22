@@ -192,6 +192,25 @@ def get_1stOrderDelta(innerPeriod, outerPeriod):
 def DeckAgolOuterInversion(innerTTV: TTVSineCurve, innerPeriod: float,
                            j: int, N: int, eccentricity: ComplexEccentricities,
                            outerPeriod='none'):
+    """
+    Returns mass of outer planet analytically computed from inner TTV sine curve,
+    as described in equation 18/42 of Deck and Agol (2016).
+
+    Args:
+        innerTTV: Inner TTV amplitude and TTV period, in days (class TTVSineCurve)
+        innerPeriod: Orbital period of inner planet, in days (float)
+        j: Number denoting j:j-N mean motion resonance of system (integer)
+        N: Number denoting Nth order mean motion resonance of system (integer)
+        eccentricity: Complex eccentricities of two planets in the system (class ComplexEccentricies)
+        outerPeriod: Period of outer planet, in days, if known ('none' or float)
+
+    Returns:
+        mu: Mass of outer planet with unit of host star mass (array or float).
+
+        If outerPeriod == 'none', mu will be an array with two possible mass solutions.
+
+        If outerPeriod is given, mu will be a float with one possible mass solution.
+    """
     if outerPeriod == 'none':
         outerPeriods = get_outerPeriods(innerPeriod, innerTTV.superperiod, j, N)
     else:
@@ -217,6 +236,25 @@ def DeckAgolOuterInversion(innerTTV: TTVSineCurve, innerPeriod: float,
 def DeckAgolInnerInversion(outerTTV: TTVSineCurve, outerPeriod: float,
                            j: int, N: int, eccentricity: ComplexEccentricities,
                            innerPeriod='none'):
+    """
+    Returns mass of inner planet analytically computed from outer TTV sine curve,
+    as described in equation 19/43 of Deck and Agol (2016).
+
+    Args:
+        outerTTV: Outer TTV amplitude and TTV period, in days (class TTVSineCurve)
+        outerPeriod: Orbital period of outer planet, in days (float)
+        j: Number denoting j:j-N mean motion resonance of system (integer)
+        N: Number denoting Nth order mean motion resonance of system (integer)
+        eccentricity: Complex eccentricities of two planets in the system (class ComplexEccentricies)
+        innerPeriod: Period of inner planet, in days, if known ('none' or float)
+
+    Returns:
+        mu: Mass of inner planet with unit of host star mass (array or float).
+
+        If innerPeriod == 'none', mu will be an array with two possible mass solutions.
+        
+        If innerPeriod is given, mu will be a float with one possible mass solution.
+    """
     if innerPeriod == 'none':
         innerPeriods = get_innerPeriods(outerPeriod, outerTTV.superperiod, j, N)
     else:
