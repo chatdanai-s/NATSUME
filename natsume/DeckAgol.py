@@ -189,7 +189,6 @@ def get_1stOrderDelta(innerPeriod, outerPeriod):
 
 
 # Inversion functions
-# LithwickTerm arg currently does NOT work and will likely be removed in the future
 def DeckAgolOuterInversion(innerTTV: TTVSineCurve, innerPeriod: float,
                            j: int, N: int, eccentricity: ComplexEccentricities,
                            outerPeriod='none'):

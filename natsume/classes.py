@@ -35,6 +35,7 @@ class ComplexEccentricities:
     def arr(self):
         """
         Returns array representation of values in class ComplexEccentricties object.
+        Note that the angles are stored and output in rad even if the input is in degrees.
 
         Args:
             None
