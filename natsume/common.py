@@ -152,14 +152,14 @@ def get_Db(alpha, j: int, order=1, eps=1e-3):
     Returns the derivatives with respect to alpha of Laplace coefficients using central finite difference
     numerical differentiation as described in Fornberg 1988.
 
-    eps smaller than 1e-4 is not recommended due to 64-bit float precision.
+    Warning: eps smaller than 1e-4 is not recommended due to 64-bit float precision.
 
     Args:
         alpha: Ratio of orbit semi-major axes, see natsume.common.get_alpha (float or array)
         j: Number denoting j:j-N mean motion resonance of system (integer)
         order: Order of derivative with respect to alpha. Only supports up to 4th order (integer)
-        eps: Epsilon used to compute the Laplace coefficient derivative.
-        The numerical differentation yields O(eps^2) error (float, default 1e-5)
+        eps: Step size used to compute the Laplace coefficient derivative.
+        The numerical differentation yields O(eps^2) error (float, default 1e-3)
 
     Returns:
         Db: Up to 4th order derivative w.r.t. alpha of the Laplace coefficient (float or array)
