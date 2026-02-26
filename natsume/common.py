@@ -147,7 +147,7 @@ def get_b(alpha, j: int, epsrel=1e-5, method='powerseries'):
 
 # Central finite difference numerical differentiation (Fornberg 1988)
 # All has O(eps^2) error
-def get_Db(alpha, j: int, order=1, eps=1e-5):
+def get_Db(alpha, j: int, order=1, eps=1e-3):
     """
     Returns the derivatives with respect to alpha of Laplace coefficients using central finite difference
     numerical differentiation as described in Fornberg 1988.
@@ -169,7 +169,7 @@ def get_Db(alpha, j: int, order=1, eps=1e-5):
     elif order == 3:
         return (0.5*get_b(alpha + 2*eps, j) - get_b(alpha + eps, j) + \
                 get_b(alpha - eps, j) - 0.5*get_b(alpha - 2*eps, j)) / (eps**3)
-    elif order == 4:
+    elif order == 4: # Due to machine epsilon being ~1e-16, only returns relative precision to ~1e-4
         return (get_b(alpha + 2*eps, j) - 4*get_b(alpha + eps, j) + 6*get_b(alpha, j) - \
                 4*get_b(alpha - eps, j) + get_b(alpha - 2*eps, j)) / (eps**4)
     else:
