@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: natsume-ttv
-Version: 0.1.3
+Version: 0.1.5
 Summary: Near-resonant Analytic TTV Solver for Unknown Mass Estimates
 Author-email: Chatdanai Sawangwong <chatdanai.saw@student.mahidol.edu>
 License: MIT
@@ -25,15 +25,11 @@ The TTV mass inversion estimations are based from Lithwick's model for 1st order
 
 Installation
 =====
-Eventually, installation should be as simple as
+Install from pypi:
 ```
-pip install natsume
+pip install natsume-ttv
 ```
 
-But right now, you can install it from the TestPyPI package index:
-```
-pip install -i https://test.pypi.org/simple/ natsume
-```
 
 Usage
 =====
