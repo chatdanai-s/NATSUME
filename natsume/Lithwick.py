@@ -18,7 +18,7 @@ def get_f(alpha, j: int):
     """
     return -(j * get_b(alpha, j)) - (alpha/2 * get_Db(alpha, j, order=1))
 
-def get_g(alpha, j: int):
+def get_g(alpha, j: int, perturber='outer'):
     """
     Returns sum of Laplace coefficients with order-unity values (denoted g),
     as described in Table 3 of Lithwick et al. (2012).
@@ -26,14 +26,18 @@ def get_g(alpha, j: int):
     Args:
         alpha: Ratio of orbit semi-major axes, see natsume.common.get_alpha (float or array)
         j: Number denoting j:j-1 mean motion resonance of system (integer)
+        perturber: Position of perturbing planet, only accepts 'inner' or 'outer'
 
     Returns:
         g: As described in Table 3 of Lithwick et al. (2012). (float or array)
     """
     if j == 2:
-        # -1/(2 * alpha^2) s.t. alpha ~ (1/2)**(2/3) for inner perturber,
-        # -2 * alpha for outer perturber, which are identical.
-        correction = -1.25992104989
+        if perturber == 'outer':
+            correction = -(2) * alpha
+        elif perturber == 'inner':
+            correction = -(1/2) / alpha**2
+        else:
+            raise ValueError(f'get_g perturber argument {perturber} does not exist!')
     else:
         correction = 0
     return (j-0.5) * get_b(alpha, j-1) + (alpha/2 * get_Db(alpha, j-1, order=1)) + correction
@@ -83,7 +87,7 @@ def LithwickOuterInversion(innerTTV: TTVSineCurve, innerPeriod: float,
 
     alpha = get_alpha(innerPeriod, outerPeriods)
     f = get_f(alpha, j)
-    g = get_g(alpha, j)
+    g = get_g(alpha, j, perturber='outer')
     Delta = get_NormalizedResonanceDistance(innerPeriod, outerPeriods, j, N=1)
     Zfree = get_Zfree(f, g, z)
 
@@ -118,7 +122,7 @@ def LithwickInnerInversion(outerTTV: TTVSineCurve, outerPeriod: float,
 
     alpha = get_alpha(innerPeriods, outerPeriod)
     f = get_f(alpha, j)
-    g = get_g(alpha, j)
+    g = get_g(alpha, j, perturber='inner')
     Delta = get_NormalizedResonanceDistance(innerPeriods, outerPeriod, j, N=1)
     Zfree = get_Zfree(f, g, z)
 

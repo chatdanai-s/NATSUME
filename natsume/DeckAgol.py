@@ -2,7 +2,6 @@
 import numpy as np
 
 from .classes import ComplexEccentricities, TTVSineCurve
-from .Lithwick import get_f, get_g, get_Zfree
 from .common import get_outerPeriods, get_innerPeriods, get_alpha, get_NormalizedResonanceDistance
 from .common import get_b, get_Db
 
@@ -18,11 +17,14 @@ def get_g_j49(alpha, j): # k=1
                   (4*j - 2) * alpha * get_Db(alpha, j-1, order=1) - \
                   alpha**2 * get_Db(alpha, j-1, order=2))
 
-def get_g_j53(alpha, j): # k=0
+def get_g_j53(alpha, j, perturber='outer'): # k=0
     if j == 3:
-        correction = -1.6225307666
-        # -3/(8 * alpha^2) s.t. alpha ~ (1/3)**(2/3) for inner perturber,
-        # -27/8 * alpha for outer perturber, which are identical!
+        if perturber == 'outer':
+            correction = -(27/8) * alpha
+        elif perturber == 'inner':
+            correction = -(3/8) / alpha**2
+        else:
+            raise ValueError(f'get_g_j53 perturber argument {perturber} does not exist!')
     else:
         correction = 0
     return 1/8 * ((2 - 7*j + 4*j**2) * get_b(alpha, j-2) + \
@@ -48,11 +50,14 @@ def get_g_j84(alpha, j): # k=1
                    (4 - 6*j) * alpha**2 * get_Db(alpha, j-2, order=2) - \
                    alpha**3 * get_Db(alpha, j-2, order=3))
 
-def get_g_j85(alpha, j): # k=0
+def get_g_j85(alpha, j, perturber='outer'): # k=0
     if j == 4:
-        # -1/(3 * alpha^2) s.t. alpha ~ (1/4)**(2/3) for inner perturber,
-        # -16/3 * alpha for outer perturber, which are identical!
-        correction = -2.11653473596
+        if perturber == 'outer':
+            correction = -(16/3) * alpha
+        elif perturber == 'inner':
+            correction = -(1/3) / alpha**2
+        else:
+            raise ValueError(f'get_g_85 perturber argument {perturber} does not exist!')
     else:
         correction = 0
     return 1/48 * ((-6 + 29*j - 30*j**2 + 8*j**3) * get_b(alpha, j-3) + \
@@ -89,11 +94,14 @@ def get_g_j93(alpha, j): # k=1
                    (6 - 8*j) * alpha**3 * get_Db(alpha, j-3, order=3) - \
                    alpha**4 * get_Db(alpha, j-3, order=4))
 
-def get_g_j94(alpha, j): # k=0
+def get_g_j94(alpha, j, perturber='outer'): # k=0
     if j == 5:
-        # -125/(384 * alpha^2) s.t. alpha ~ (1/5)**(2/3) for inner perturber,
-        # -3125/384 * alpha for outer perturber, which are identical!
-        correction = -2.78316397571
+        if perturber == 'outer':
+            correction = -(3125/384) * alpha
+        elif perturber == 'inner':
+            correction = -(125/384) / alpha**2
+        else:
+            raise ValueError(f'get_g_j94 perturber argument {perturber} does not exist!')
     else:
         correction = 0
     return 1/384 * ((24 - 146*j + 211*j**2 - 104*j**3 + 16*j**4) * get_b(alpha, j-4) + \
@@ -103,13 +111,13 @@ def get_g_j94(alpha, j): # k=0
                     alpha**4 * get_Db(alpha, j-4, order=4)) + correction
 
 # Get gk == g_j,k;N
-def get_gk(N, alpha, j):
+def get_gk(N, alpha, j, perturber='outer'):
     if N == 2:
-        gk = [get_g_j53(alpha, j), get_g_j49(alpha, j), get_g_j45(alpha, j)]
+        gk = [get_g_j53(alpha, j, perturber=perturber), get_g_j49(alpha, j), get_g_j45(alpha, j)]
     elif N == 3:
-        gk = [get_g_j85(alpha, j), get_g_j84(alpha, j), get_g_j83(alpha, j), get_g_j82(alpha, j)]
+        gk = [get_g_j85(alpha, j, perturber=perturber), get_g_j84(alpha, j), get_g_j83(alpha, j), get_g_j82(alpha, j)]
     elif N == 4: 
-        gk = [get_g_j94(alpha, j), get_g_j93(alpha, j), get_g_j92(alpha, j), get_g_j91(alpha, j), get_g_j90(alpha, j)]
+        gk = [get_g_j94(alpha, j, perturber=perturber), get_g_j93(alpha, j), get_g_j92(alpha, j), get_g_j91(alpha, j), get_g_j90(alpha, j)]
     else:
         raise NotImplementedError('NATSUME does not support TTVs of order N > 4 near MMR.')
     return gk
@@ -223,7 +231,7 @@ def DeckAgolOuterInversion(innerTTV: TTVSineCurve, innerPeriod: float,
     if (e1 == 0) and (e2 == 0):
         raise ValueError('The Deck-Agol model does not provide physical zero-eccentricity mass solutions at N > 1.')
 
-    gk = get_gk(N, alpha, j)
+    gk = get_gk(N, alpha, j, perturber='outer')
     A1 = get_A1(gk, e1, e2, w1, w2)
     A2 = get_A2(gk, e1, e2, w1, w2)
     B11 = get_B11(gk, e1, e2, w1, w2)
@@ -267,7 +275,7 @@ def DeckAgolInnerInversion(outerTTV: TTVSineCurve, outerPeriod: float,
     if (e1 == 0) and (e2 == 0):
         raise ValueError('The Deck-Agol model does not provide physical zero-eccentricity mass solutions at N > 1.')
     
-    gk = get_gk(N, alpha, j)
+    gk = get_gk(N, alpha, j, perturber='inner')
     A1 = get_A1(gk, e1, e2, w1, w2)
     A2 = get_A2(gk, e1, e2, w1, w2)
     B21 = get_B21(gk, e1, e2, w1, w2)
