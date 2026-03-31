@@ -16,65 +16,105 @@ pip install natsume-ttv
 Usage
 =====
 
-To use NATSUME:
-* Build two objects containing TTV signal information (amplitude and "superperiod") and complex orbital eccentricity information (see Lithwick's eqn. 11) via ``natsume.get_TTVSineCurve`` and  ``natsume.get_ComplexEccentricities`` respectively.
-* Estimate inner or outer exoplanet masses via ``natsume.EstimateInnerMass`` or ``natsume.EstimateOuterMass`` functions.
-* The code will return a list of two possible mass solutions calculated from the input arguments.
-  * Remark: There are two solutions, because the perturbing planet's period can be unknown if it is non-transiting, and two periods are possible given the definition of the TTV superperiod (see Lithwick's eqn. 5). You can restrict to one solution by specifying the perturbing planet's period in the estimation functions. This skips the calculation of the perturbing planet's period completely, so make sure the ``mmr`` argument is close enough!
+`natsume` is to be used with the following steps:
 
-For example, to estimate the outer planet Kepler-32 c's mass assuming zero eccentricity:
+1. Define the orbital elements (orbital periods, eccentricities, arguments of periastron), TTV signal parameters (amplitudes, superperiods), and MMR scenario (e.g. `'2:1'`, `'5:3'`) of the planet pair. All units are in days or degrees.  
+2. Encode complex eccentricity and sinusoidal TTV information into the `natsume.classes.ComplexEccentricities` and `natsume.classes.TTVSineCurve` objects using `natsume.get_ComplexEccentricities` and `natsume.get_TTVSineCurve` functions.
+3. Estimate inner or outer exoplanet masses using `natsume.EstimateInnerMass` or `natsume.EstimateOuterMass` functions.
+
+TTV amplitude and superperiod characterization is left to the user, as multiple valid approaches exist.
+
+To illustrate the steps above, suppose the following planetary parameters for a pair in the Kepler-32 system
+
+```python
+# Planetary parameters for Kepler-32b/c
+Pb = 5.901    # Inner period (days; Lithwick+12, Table 1)
+Pc = 8.752    # Outer period (days; Lithwick+12, Table 1)
+Vb = 0.0062   # Inner TTV Amplitude (days; Lithwick+12, Table 1)
+Vc = 0.0077	  # Outer TTV Amplitude (days; Lithwick+12, Table 1)
+Pttvb = 267.1 # TTV "superperiod" for planet b (days; Holczer+16, Table 5)
+Pttvc = Pttvb # TTV "superperiod" for planet c (Assume identical superperiod
+              # as inner TTV as Holczer+16 did not report the period)             
+mmr = '3:2'   # MMR Scenario
+
+# Eccentricity and arguments of periastron (deg)
+# Calculated from Fabrycky+12, Table 6 eccentricity vectors
+eb = 0.003822
+ec = 0.002384
+wb = -166.56
+wc = +43.98
+
+Mstar = 0.49  # Host star mass (solar masses; Fabrycky+12, Table 6)
+```
+
+We then encode system complex eccentricity and sinusoidal TTV informations into the `ComplexEccentricities` object with `natsume.get_ComplexEccentricities` and `TTVSineCurve` object with `natsume.get_TTVSineCurve`
 
 ```python
 import natsume
 
-# We use Kepler-32, all time unit in days (from Lithwick et al. 2012)
-# Expected solution: 7.59 Earths for outer planet c
+# Build sinusoidal TTV object for inner TTV
+TTVb = natsume.get_TTVSineCurve(amplitude=Vb, superperiod=Pttvb)
+TTVc = natsume.get_TTVSineCurve(amplitude=Vc, superperiod=Pttvc)
 
-# Setup parameters here
-Pb = 5.901    # Inner period (days)
-Pc = 8.752    # Outer period (days)
-Vb = 0.0062   # Inner TTV Amplitude (days)
-PTTV = 1/abs(3/Pc - 2/Pb)  # Calculated TTV "superperiod" (not provided by Lithwick; so we calculate)
-mmr = '3:2'   # MMR Scenario
-Mstar = 0.49  # Host star mass (solar masses)
+# Build complex eccentricity object for Kepler-32b/c pair
+z = natsume.get_ComplexEccentricities(e1=eb, w1=wb, e2=ec, w2=wc)
+```
 
-# Build object for sinusoidal inner TTV
-TTVb = natsume.get_TTVSineCurve(amplitude=Vb, superperiod=PTTV)
+Finally, we calculate exoplanet masses using analytic sinusoidal TTV models
 
-# Build object for system complex eccentricity; Assumes zero eccentricity in this case
-z = natsume.get_ComplexEccentricities()
-
+```python
 # Estimate outer planet mass relative to the host star
 mu_c = natsume.EstimateOuterMass(
-   innerTTV=TTVb,
-   inner_period=Pb,
-   mmr=mmr,
-   eccentricity=z,
-   outer_period=None
+	innerTTV=TTVb,
+	inner_period=Pb,
+	mmr=mmr,
+	eccentricity=z,
+	outer_period=None
+)
+# Estimate inner planet mass relative to the host star
+mu_b = natsume.EstimateInnerMass(
+	outerTTV=TTVc,
+	outer_period=Pc,
+	mmr=mmr,
+	eccentricity=z,
+	inner_period=None
 )
 ```
-For nonzero eccentricities, let's suppose inner "free eccentricity" is 0.01, inner longitude of periastron is 90 degrees, outer "free eccentricity" is 0.03, and outer longitude of periastron is 200 degrees, the following arguments are to be put in ``natsume.get_ComplexEccentricities``
-```python
-z = natsume.get_ComplexEccentricities(e1=0.01, w1=90, e2=0.03, w2=200)
-```
 
-And if the perturbing outer planet's orbital period is known (``Pc``), modify the ``outer_period=None`` argument in ``natsume.EstimateOuterMass`` as follows:
+However, through above code, `mu_c` and `mu_b` will be `numpy` arrays containing two possible mass solutions. This is because the perturbing planet's period can be unknown if it is non-transiting, and two periods are possible given the definition of the TTV superperiod (see Lithwick's eqn. 5). If the perturbing planets' orbital periods are already known, we can skip the calculation of perturbing planet's orbital period entirely, and replace the `None` arguments with appropriate values
+
 ```python
+# Estimate outer planet mass relative to the host star
 mu_c = natsume.EstimateOuterMass(
-   innerTTV=TTVb,
-   inner_period=Pb,
-   mmr=mmr,
-   eccentricity=z,
-   outer_period=Pc
+	innerTTV=TTVb,
+	inner_period=Pb,
+	mmr=mmr,
+	eccentricity=z,
+	outer_period=Pc
+)
+# Estimate inner planet mass relative to the host star
+mu_b = natsume.EstimateInnerMass(
+	outerTTV=TTVc,
+	outer_period=Pc,
+	mmr=mmr,
+	eccentricity=z,
+	inner_period=Pb
 )
 ```
 
-Finally, conversion from ``mu_c`` in host stellar mass to mass estimate in Earth masses can be done with ``astropy.units``. In-package support may be available in the future.
+To which `mu_c` and `mu_b` will be floats
+
+Conversion from `mu_c` and `mu_b` which are relative to host stellar masses to `m_c` and `m_b`in Earth masses can also be done with `astropy.units`
 ```python
+# Convert planet masses relative to host star to Earth masses
 from astropy import units as u
+m_b = (mu_b * Mstar*u.M_sun).to(u.M_earth).value
 m_c = (mu_c * Mstar*u.M_sun).to(u.M_earth).value
-print(f'Estimated outer planet mass: {m} Earths')
 ```
 
-
-For further details, see documentation which hasn't been written yet (It's work in progress code!, or you can just read the source code)
+As an addendum, nominal mass calculations, where orbits are assumed with zero eccentricity, can be done by using the following variable `z0` in the `eccentricity` arguments of mass calculation functions
+```python
+# Build complex eccentricity object for zero eccentricity
+z0 = natsume.get_ComplexEccentricities()
+```
+to which nominal mass calculations are only possible in near first-order resonance scenarios.
