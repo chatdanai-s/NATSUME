@@ -69,7 +69,7 @@ mu_c = natsume.EstimateOuterMass(
 	inner_period=Pb,
 	mmr=mmr,
 	eccentricity=z,
-	outer_period=None
+	outer_period='none'
 )
 # Estimate inner planet mass relative to the host star
 mu_b = natsume.EstimateInnerMass(
@@ -77,11 +77,11 @@ mu_b = natsume.EstimateInnerMass(
 	outer_period=Pc,
 	mmr=mmr,
 	eccentricity=z,
-	inner_period=None
+	inner_period='none'
 )
 ```
 
-However, through above code, `mu_c` and `mu_b` will be `numpy` arrays containing two possible mass solutions. This is because the perturbing planet's period can be unknown if it is non-transiting, and two periods are possible given the definition of the TTV superperiod (see Lithwick's eqn. 5). If the perturbing planets' orbital periods are already known, we can skip the calculation of perturbing planet's orbital period entirely, and replace the `None` arguments with appropriate values
+However, through above code, `mu_c` and `mu_b` will be `numpy` arrays containing two possible mass solutions. This is because the perturbing planet's period can be unknown if it is non-transiting, and two periods are possible given the definition of the TTV superperiod (see Lithwick's eqn. 5). If the perturbing planets' orbital periods are already known, we can skip the calculation of perturbing planet's orbital period entirely, and replace the `'none'` arguments with appropriate values
 
 ```python
 # Estimate outer planet mass relative to the host star
