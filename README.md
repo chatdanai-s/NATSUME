@@ -1,9 +1,9 @@
 # NATSUME  
-**N**ear-resonant **A**nalytic **T**TV **S**olver for **U**nknown **M**ass **E**stimates (NATSUME) for Python 3 (Work in progress!)
+**N**ear-resonant **A**nalytic **T**TV **S**olver for **U**nknown **M**ass **E**stimates (NATSUME) for Python 3.
 
 A python 3 module which aims to quickly estimate non-transiting exoplanet masses in possible near Mean Motion Resonance (MMR) scenarios from approximately sinusoidal Transit Timing Variation (TTV) signals.
 
-The TTV mass inversion estimations are based from Lithwick's model for 1st order near MMR (https://doi.org/10.1088/0004-637X/761/2/122) and Deck-Agol's model for higher order near MMRs (https://doi.org/10.3847/0004-637X/821/2/96).
+TTV mass inversions are transcribed from Lithwick's model for 1st order near MMR (https://doi.org/10.1088/0004-637X/761/2/122) and Deck-Agol's model for higher order near MMRs (https://doi.org/10.3847/0004-637X/821/2/96).
 
 Installation
 =====
@@ -13,16 +13,19 @@ pip install natsume-ttv
 ```
 
 
-Usage
+Usage Overview
 =====
 
 `natsume` is to be used with the following steps:
 
-1. Define the orbital elements (orbital periods, eccentricities, arguments of periastron), TTV signal parameters (amplitudes, superperiods), and MMR scenario (e.g. `'2:1'`, `'5:3'`) of the planet pair. All units are in days or degrees.  
+1. Define the orbital elements (orbital periods, eccentricities, longitudes of periastron), TTV signal parameters (amplitudes, superperiods), and MMR scenario (e.g. `'2:1'`, `'5:3'`) of the planet pair. All units are in days or degrees.  
 2. Encode complex eccentricity and sinusoidal TTV information into the `natsume.classes.ComplexEccentricities` and `natsume.classes.TTVSineCurve` objects using `natsume.get_ComplexEccentricities` and `natsume.get_TTVSineCurve` functions.
 3. Estimate inner or outer exoplanet masses using `natsume.EstimateInnerMass` or `natsume.EstimateOuterMass` functions.
 
 TTV amplitude and superperiod characterization is left to the user, as multiple valid approaches exist.
+
+Usage Example
+=====
 
 To illustrate the steps above, suppose the following planetary parameters for a pair in the Kepler-32 system
 
@@ -104,6 +107,9 @@ mu_b = natsume.EstimateInnerMass(
 
 To which `mu_c` and `mu_b` will be floats
 
+Addendum
+=====
+
 Conversion from `mu_c` and `mu_b` which are relative to host stellar masses to `m_c` and `m_b`in Earth masses can also be done with `astropy.units`
 ```python
 # Convert planet masses relative to host star to Earth masses
@@ -112,7 +118,7 @@ m_b = (mu_b * Mstar*u.M_sun).to(u.M_earth).value
 m_c = (mu_c * Mstar*u.M_sun).to(u.M_earth).value
 ```
 
-As an addendum, nominal mass calculations, where orbits are assumed with zero eccentricity, can be done by using the following variable `z0` in the `eccentricity` arguments of mass calculation functions
+Nominal mass calculations, where orbits are assumed with zero eccentricity, can be done by using the following variable `z0` in the `eccentricity` arguments of mass calculation functions
 ```python
 # Build complex eccentricity object for zero eccentricity
 z0 = natsume.get_ComplexEccentricities()
