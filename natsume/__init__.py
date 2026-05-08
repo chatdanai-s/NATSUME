@@ -5,8 +5,13 @@ from .Lithwick import LithwickOuterInversion, LithwickInnerInversion
 from .DeckAgol import DeckAgolOuterInversion, DeckAgolInnerInversion
 
 # Create classes (Cannot define classes here due to circular import)
-def get_ComplexEccentricities(inner_e=0, inner_periastron=0,
-                              outer_e=0, outer_periastron=0):
+def get_ComplexEccentricities(
+    inner_e=0, inner_periastron=0,
+    outer_e=0, outer_periastron=0,
+    *,
+    e1=None, w1=None,
+    e2=None, w2=None
+):
     """
     Returns ComplexEccentricities object for two planets in the system.
 
@@ -18,9 +23,26 @@ def get_ComplexEccentricities(inner_e=0, inner_periastron=0,
         outer_e: Outer orbital eccentricity, must be at least 0 (float)
         outer_periastron: Outer longitude of periastron, in degrees (float)
 
+    Aliases (will override name arguments):
+        e1 -> inner_e
+        w1 -> inner_periastron
+        e2 -> outer_e
+        w2 -> outer_periastron
+    
     Returns:
         Complex eccentricities of two planets in the system (class ComplexEccentricities)
     """
+
+    # Aliases override canonical names
+    if e1 is not None:
+        inner_e = e1
+    if w1 is not None:
+        inner_periastron = w1
+    if e2 is not None:
+        outer_e = e2
+    if w2 is not None:
+        outer_periastron = w2
+
     return ComplexEccentricities(inner_e, inner_periastron, outer_e, outer_periastron)
 
 def get_TTVSineCurve(amplitude: float, superperiod: float):
@@ -61,6 +83,10 @@ def EstimateOuterMass(innerTTV: TTVSineCurve, inner_period: float, mmr: str,
 
         If outer_period is given, mu will be a float with one possible mass solution.
     """
+    # Takes alternative arguments None/"None" -> "none"
+    if (outer_period == None) or (outer_period == "None"):
+        outer_period = "none"
+
     j, N = get_MMR(mmr)
     if N == 1:
         mass = LithwickOuterInversion(innerTTV, inner_period, j,
@@ -90,6 +116,10 @@ def EstimateInnerMass(outerTTV: TTVSineCurve, outer_period: float, mmr: str,
 
         If inner_period is given, mu will be a float with one possible mass solution.
     """
+    # Takes alternative arguments None/"None" -> "none"
+    if (inner_period == None) or (inner_period == "None"):
+        inner_period = "none"
+    
     j, N = get_MMR(mmr)
     if N == 1:
         mass = LithwickInnerInversion(outerTTV, outer_period, j,
