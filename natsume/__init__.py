@@ -33,7 +33,7 @@ def get_ComplexEccentricities(
         Complex eccentricities of two planets in the system (class ComplexEccentricities)
     """
 
-    # Aliases override canonical names
+    # Aliases override name arguments
     if e1 is not None:
         inner_e = e1
     if w1 is not None:
